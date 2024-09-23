@@ -1,0 +1,14 @@
+---
+name: Multiplatform Build
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  build-windows:
+    uses: ./.github/workflows/windows-build.yml
+  build-ubuntu:
+    uses: ./.github/workflows/ubuntu-build.yml
+  build-macos:
+    uses: ./.github/workflows/macos-build.yml
