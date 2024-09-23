@@ -7,7 +7,7 @@ class AppConfig:
     Configuration File
     """
 
-    APP_NAME: str = "БФТ Закупки"
+    APP_NAME: str = "БФТ-КПЭ"
 
     PROJECT_ROOT: Path = Path(sys.argv[0]).resolve().parent
     FONT_SIZE: int = 12
