@@ -80,7 +80,7 @@ class MainWindow(QMainWindow):
             return
 
         for order_file in order_files:
-            order_template_path = AppConfig.get_order_path("orders/order_templates")
+            order_template_path = AppConfig.get_some_path("orders/order_templates")
             try:
                 shutil.copy(order_file, order_template_path)
             except shutil.SameFileError:
@@ -102,7 +102,7 @@ class MainWindow(QMainWindow):
         start_year_quarter = utils.date_to_year_quarter(start_date)
         end_year_quarter = utils.date_to_year_quarter(end_date)
 
-        folder_path = AppConfig.get_order_path("orders/final_reports")
+        folder_path = AppConfig.get_some_path("orders/final_reports")
         report_name = (
             f"Отчет о заявках за период - {start_year_quarter[0]} кв. {start_year_quarter[1]} - {end_year_quarter[0]} кв. {end_year_quarter[1]}.xlsx"
         )
