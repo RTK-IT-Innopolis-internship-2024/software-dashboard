@@ -63,11 +63,6 @@ jobs:
           --dir ./dist/Apps-Purchases-macos-latest
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - name: Copy orders directory
-        run: |
-          cp -r ./orders ./dist/Apps-Purchases-windows-latest/
-          cp -r ./orders ./dist/Apps-Purchases-ubuntu-latest/
-          cp -r ./orders ./dist/Apps-Purchases-macos-latest/
       - name: Create Archives
         run: |
           cd ./dist
