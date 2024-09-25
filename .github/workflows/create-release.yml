@@ -16,6 +16,7 @@ jobs:
         id: get_latest_release_with_body
         run: |
           releases=$(gh release list --limit 100 --json tagName --jq '.[] | select(.tagName != null) | .tagName')
+          body=""
           for tag in $releases; do
             body=$(gh release view "$tag" --json body -q '.body')
             if [ -n "$body" ]; then
