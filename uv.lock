@@ -292,6 +292,19 @@ wheels = [
 ]
 
 [[package]]
+name = "plotly"
+version = "5.24.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "tenacity" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/79/4f/428f6d959818d7425a94c190a6b26fbc58035cbef40bf249be0b62a9aedd/plotly-5.24.1.tar.gz", hash = "sha256:dbc8ac8339d248a4bcc36e08a5659bacfe1b079390b8953533f4eb22169b4bae", size = 9479398 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e5/ae/580600f441f6fc05218bd6c9d5794f4aef072a7d9093b291f1c50a9db8bc/plotly-5.24.1-py3-none-any.whl", hash = "sha256:f67073a1e637eb0dc3e46324d9d51e2fe76e9727c892dde64ddf1e1b51f29089", size = 19054220 },
+]
+
+[[package]]
 name = "pre-commit"
 version = "3.8.0"
 source = { registry = "https://pypi.org/simple" }
@@ -465,6 +478,50 @@ wheels = [
 ]
 
 [[package]]
+name = "pyqt6-webengine"
+version = "6.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyqt6" },
+    { name = "pyqt6-sip" },
+    { name = "pyqt6-webengine-qt6" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/87/88/230ec599944edf941f4cca8d1439e3a9c8c546715434eee05dce7ff032ed/PyQt6_WebEngine-6.7.0.tar.gz", hash = "sha256:68edc7adb6d9e275f5de956881e79cca0d71fad439abeaa10d823bff5ac55001", size = 32593 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f9/74/10eb5db10e50584096c136f2ed15cee782da19344822dafff02a70de60ad/PyQt6_WebEngine-6.7.0-cp38-abi3-macosx_10_14_universal2.whl", hash = "sha256:1a3df9d6ac2dfa1bb3b826f3926c13db5b6d427e96e8d574c5aa5445a8b13db8", size = 388489 },
+    { url = "https://files.pythonhosted.org/packages/76/a2/c5d699f5637f2808609baad563690a64b2773420535eb72ffc9992e62ebe/PyQt6_WebEngine-6.7.0-cp38-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:b4272943ef8c71b77d2421409982ddef56ff4c97be415b808f09b3507991460b", size = 268337 },
+    { url = "https://files.pythonhosted.org/packages/66/ea/9b8d93a5c81b536378c817b69ae373ab0c09e43878013a0aa5cd092e6f5e/PyQt6_WebEngine-6.7.0-cp38-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:098b5f8d5903a3091010098694f84dd786cca878ee28a5a3ce651507d5d65468", size = 268626 },
+    { url = "https://files.pythonhosted.org/packages/f9/28/495a8908b7d27cea17c9e1a3257e6165f90b793543a8e4787d70e57731fe/PyQt6_WebEngine-6.7.0-cp38-abi3-win_amd64.whl", hash = "sha256:e79191e626303b11ae9a3ee98e70160f50bc90a9c4df92df17bade8290e139e8", size = 215995 },
+]
+
+[[package]]
+name = "pyqt6-webengine-qt6"
+version = "6.7.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyqt6-webenginesubwheel-qt6" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d7/1d/6cafc0a55f55298257226d155ebe8a5c3c7bb25972af099fef01274a8fea/PyQt6_WebEngine_Qt6-6.7.2-py3-none-macosx_10_14_x86_64.whl", hash = "sha256:26c07e9ac38d67250369cbc3e2d94b6b7b694d03b1e89ba218a4ff60e45bf732", size = 26214068 },
+    { url = "https://files.pythonhosted.org/packages/2f/4b/bf3766d8bef94fa94b24414950fa3dfeaf5f1d81aace9ef5779a3d261723/PyQt6_WebEngine_Qt6-6.7.2-py3-none-macosx_11_0_arm64.whl", hash = "sha256:59629927077ff9382424ea0dc1e6cd97d9c662c1aeca76f50fb6899b48c6a7c0", size = 26207594 },
+    { url = "https://files.pythonhosted.org/packages/f9/f0/bd58a0a5887a47e3fb299a7e6f422b61148b4ac20cdcca631339bf3b5b38/PyQt6_WebEngine_Qt6-6.7.2-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:9e150376fd501639819c97504cc92c3af2be17455b3c5f60b602600ff642ac72", size = 26057115 },
+    { url = "https://files.pythonhosted.org/packages/e7/db/bc4ebd7378fc9a3a643d32bbcb9f3cdb2506b5c7805e6dbed00adbaea726/PyQt6_WebEngine_Qt6-6.7.2-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:6eaec7d52294ea879c041712aca18cc8df701f47d47f5831d582983e2a9a2974", size = 26065200 },
+    { url = "https://files.pythonhosted.org/packages/a5/21/ccf8ca89ce515445f41fcfb9d37e326ebbfeece5eadac98c27f449f20f2f/PyQt6_WebEngine_Qt6-6.7.2-py3-none-win_amd64.whl", hash = "sha256:5ec6f5d414ff3d3d02e717f1153a785b7e48fd3f0ac89b8c13159399fbf63cf9", size = 26869938 },
+]
+
+[[package]]
+name = "pyqt6-webenginesubwheel-qt6"
+version = "6.7.2"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a3/79/6410b332d64e4a32e1ec47a3d334f5a8dcbe321b6601a2117f787045e184/PyQt6_WebEngineSubwheel_Qt6-6.7.2-py3-none-macosx_10_14_x86_64.whl", hash = "sha256:e4ca2807e435a9e89e8c470a336c4ef0cc96714b113241ce93ac43484b82a4f6", size = 81810328 },
+    { url = "https://files.pythonhosted.org/packages/a2/7a/3ea24856c4921736b266f85e7994b641b71363c6fcadb9f89497d890ab14/PyQt6_WebEngineSubwheel_Qt6-6.7.2-py3-none-macosx_11_0_arm64.whl", hash = "sha256:339e35dfdfac798d64b0dda458874b6192fe419eac37c11b1f1ec544c91c8653", size = 72428255 },
+    { url = "https://files.pythonhosted.org/packages/6d/e2/18576c44f392c41553265affb36f05c724bda1845a804a5ea5608f2da734/PyQt6_WebEngineSubwheel_Qt6-6.7.2-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:34d5d4b0968ee9f696856ce071f8dfd67b48fcacdf98f3a68d22a6d70381e8b9", size = 70338540 },
+    { url = "https://files.pythonhosted.org/packages/cd/f8/ed758bb4586e26db891e2f6798031bd3ed338a8da0d066673b023c99fce0/PyQt6_WebEngineSubwheel_Qt6-6.7.2-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:0b8317bd440d8d88a862dfdcf591f14c389c2a82ff53825e49bbcaf2d1bcb69b", size = 76061771 },
+    { url = "https://files.pythonhosted.org/packages/80/b0/c5ea81e60dddcd1b57cbe777de8adf0746f63a1a87fdf49f2463a13b285b/PyQt6_WebEngineSubwheel_Qt6-6.7.2-py3-none-win_amd64.whl", hash = "sha256:36908b5770538e08f3125db2be5177d14c4ae8825386dca7785029a6a63ed37c", size = 66266678 },
+]
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 source = { registry = "https://pypi.org/simple" }
@@ -594,9 +651,11 @@ dependencies = [
     { name = "numpy" },
     { name = "openpyxl" },
     { name = "pandas" },
+    { name = "plotly" },
     { name = "pybind11" },
     { name = "pyinstaller" },
     { name = "pyqt6" },
+    { name = "pyqt6-webengine" },
     { name = "setuptools" },
     { name = "wheel" },
 ]
@@ -615,9 +674,11 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.1.1" },
     { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "pandas", specifier = ">=2.2.2" },
+    { name = "plotly", specifier = ">=5.24.1" },
     { name = "pybind11", specifier = ">=2.13.5" },
     { name = "pyinstaller", specifier = ">=6.10.0" },
     { name = "pyqt6", specifier = ">=6.7.1" },
+    { name = "pyqt6-webengine", specifier = ">=6.7.0" },
     { name = "setuptools", specifier = ">=74.0.0" },
     { name = "wheel", specifier = ">=0.44.0" },
 ]
@@ -628,6 +689,15 @@ dev = [
     { name = "pre-commit", specifier = ">=3.8.0" },
     { name = "ruff", specifier = ">=0.6.3" },
     { name = "yamlfix", specifier = ">=1.17.0" },
+]
+
+[[package]]
+name = "tenacity"
+version = "9.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/cd/94/91fccdb4b8110642462e653d5dcb27e7b674742ad68efd146367da7bdb10/tenacity-9.0.0.tar.gz", hash = "sha256:807f37ca97d62aa361264d497b0e31e92b8027044942bfa756160d908320d73b", size = 47421 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b6/cb/b86984bed139586d01532a587464b5805f12e397594f19f931c4c2fbfa61/tenacity-9.0.0-py3-none-any.whl", hash = "sha256:93de0c98785b27fcf659856aa9f54bfbd399e29969b0621bc7f762bd441b4539", size = 28169 },
 ]
 
 [[package]]

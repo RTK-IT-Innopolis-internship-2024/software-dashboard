@@ -5,8 +5,7 @@ import sys
 from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QApplication
 
-from .ui.main_window import MainWindow
-from .utils.config import AppConfig
+from ui.main_window import MainWindow
 
 
 # https://stackoverflow.com/questions/4938723/what-is-the-correct-way-to-make-my-pyqt-application-quit-when-killed-from-the-co
@@ -28,8 +27,6 @@ def run() -> int:
     timer = QTimer()
     timer.start(1000)  # run every second
     timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
-
-    AppConfig.initialize()
 
     window: MainWindow = MainWindow()
     window.show()
