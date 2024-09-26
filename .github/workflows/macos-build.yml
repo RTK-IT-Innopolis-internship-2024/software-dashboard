@@ -29,12 +29,12 @@ jobs:
       - name: Run yamlfix linter - fix yamls
         run: uv run yamlfix .
       - name: Build application with PyInstaller
-        run: uv run pyinstaller main.py --onefile --windowed --name "Apps-Purchases-macOS"
+        run: uv run pyinstaller main.py --onefile --windowed --name "Apps-dashboard-macOS"
           --distpath dist/macos --add-data "resources:resources"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Apps-Purchases-macOS
-          path: dist/macos/Apps-Purchases*
+          name: Apps-dashboard-macOS
+          path: dist/macos/Apps-dashboard*
       - name: Minimize uv cache
         run: uv cache prune --ci

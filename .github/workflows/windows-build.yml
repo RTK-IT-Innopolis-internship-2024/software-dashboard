@@ -30,12 +30,12 @@ jobs:
       - name: Run yamlfix linter - fix yamls
         run: uv run yamlfix .
       - name: Build application with PyInstaller
-        run: uv run pyinstaller main.py --onefile --windowed --name "Apps-Purchases-Windows"
+        run: uv run pyinstaller main.py --onefile --windowed --name "Apps-dashboard-Windows"
           --distpath dist/windows --add-data "resources:resources"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Apps-Purchases-Windows
-          path: dist/windows/Apps-Purchases*
+          name: Apps-dashboard-Windows
+          path: dist/windows/Apps-dashboard*
       - name: Minimize uv cache
         run: uv cache prune --ci

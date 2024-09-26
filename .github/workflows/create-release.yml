@@ -49,26 +49,26 @@ jobs:
           && sudo apt update \
           && sudo apt install gh -y
       - name: Download Windows App
-        run: gh run download --repo ${{ github.repository }} --name Apps-Purchases-Windows
-          --dir ./dist/Apps-Purchases-windows-latest
+        run: gh run download --repo ${{ github.repository }} --name Apps-dashboard-Windows
+          --dir ./dist/Apps-dashboard-windows-latest
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Download Linux App
-        run: gh run download --repo ${{ github.repository }} --name Apps-Purchases-Ubuntu
-          --dir ./dist/Apps-Purchases-ubuntu-latest
+        run: gh run download --repo ${{ github.repository }} --name Apps-dashboard-Ubuntu
+          --dir ./dist/Apps-dashboard-ubuntu-latest
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Download macOS App
-        run: gh run download --repo ${{ github.repository }} --name Apps-Purchases-macOS
-          --dir ./dist/Apps-Purchases-macos-latest
+        run: gh run download --repo ${{ github.repository }} --name Apps-dashboard-macOS
+          --dir ./dist/Apps-dashboard-macos-latest
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Create Archives
         run: |
           cd ./dist
-          zip -r Apps-Purchases-windows-latest.zip Apps-Purchases-windows-latest
-          zip -r Apps-Purchases-ubuntu-latest.zip Apps-Purchases-ubuntu-latest
-          zip -r Apps-Purchases-macos-latest.zip Apps-Purchases-macos-latest
+          zip -r Apps-dashboard-windows-latest.zip Apps-dashboard-windows-latest
+          zip -r Apps-dashboard-ubuntu-latest.zip Apps-dashboard-ubuntu-latest
+          zip -r Apps-dashboard-macos-latest.zip Apps-dashboard-macos-latest
       - name: Set current date
         id: set_current_date
         run: echo "current_date=$(date +v%Y.%m.%d.%H.%M.%S)" >> $GITHUB_ENV
@@ -90,7 +90,7 @@ jobs:
           draft: false
           prerelease: false
           files: |-
-            ./dist/Apps-Purchases-windows-latest.zip
-            ./dist/Apps-Purchases-ubuntu-latest.zip
-            ./dist/Apps-Purchases-macos-latest.zip
+            ./dist/Apps-dashboard-windows-latest.zip
+            ./dist/Apps-dashboard-ubuntu-latest.zip
+            ./dist/Apps-dashboard-macos-latest.zip
           repository: ${{ github.repository }}
