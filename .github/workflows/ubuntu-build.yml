@@ -29,7 +29,7 @@ jobs:
       - name: Run yamlfix linter - fix yamls
         run: uv run yamlfix .
       - name: Build application with PyInstaller
-        run: uv run pyinstaller src/main.py --onefile --windowed --name "Apps-Purchases-Ubuntu"
+        run: uv run pyinstaller main.py --onefile --windowed --name "Apps-Purchases-Ubuntu"
           --distpath dist/ubuntu --add-data "resources:resources"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
