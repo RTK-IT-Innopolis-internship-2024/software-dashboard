@@ -34,13 +34,23 @@ $ pip install uv
 
 See the [installation documentation](https://docs.astral.sh/uv/getting-started/installation/) for details and alternative installation methods.
 
-### Install venv by [sync command](https://docs.astral.sh/uv/reference/cli/#uv-sync)
+### Install and activate venv by [sync command](https://docs.astral.sh/uv/reference/cli/#uv-sync)
+
+Install venv and sync dependencies
 
 ```shell
 uv sync
 ```
 
-### Use created venv for next commands
+Activate venv
+
+```
+# На Windows:
+$ .venv\Scripts\activate
+
+# На macOS и Linux:
+$ source .venv/bin/activate
+```
 
 ### Set up the git hook scripts by [pre-commit](https://pre-commit.com/#3-install-the-git-hook-scripts)
 
@@ -54,4 +64,48 @@ pre-commit install
 
 ```shell
 uv run main.py
+```
+
+## 2.2. Alternative instruction with pip tool (not recommended)
+
+### [Install python 3.11](https://docs.python.org/3.11/using/index.html)
+
+### Install pip by this [documentation](https://pip.pypa.io/en/stable/installation/)
+
+### Install venv
+
+Create venv
+
+```shell
+python -m venv .venv
+```
+
+Activate venv
+
+```
+# На Windows:
+$ .venv\Scripts\activate
+
+# На macOS и Linux:
+$ source .venv/bin/activate
+```
+
+After that install dependencies
+
+```shell
+pip install .
+```
+
+### Set up the git hook scripts by [pre-commit](https://pre-commit.com/#3-install-the-git-hook-scripts)
+
+```shell
+pre-commit install
+```
+
+### Open `./src` and just code it
+
+### Open your app
+
+```shell
+python src/main.py
 ```

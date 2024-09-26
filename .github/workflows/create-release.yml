@@ -63,6 +63,8 @@ jobs:
           --dir ./dist/Apps-Purchases-macos-latest
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - name: List all files in dist
+        run: find ./dist -type f
       - name: Create Archives
         run: |
           cd ./dist
