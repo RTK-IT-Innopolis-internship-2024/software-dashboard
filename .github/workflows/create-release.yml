@@ -63,8 +63,6 @@ jobs:
           --dir ./dist/Apps-Purchases-macos-latest
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - name: List all files in dist
-        run: find ./dist -type f
       - name: Create Archives
         run: |
           cd ./dist
@@ -74,8 +72,12 @@ jobs:
       - name: Set current date
         id: set_current_date
         run: echo "current_date=$(date +v%Y.%m.%d.%H.%M.%S)" >> $GITHUB_ENV
+      - name: List all files in dist
+        run: find ./dist -type f
       - name: Check GitHub Token
         run: echo ${{ secrets.TOKEN }}
+      - name: Check repository
+        run: echo ${{ github.repository }}
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -91,3 +93,4 @@ jobs:
             ./dist/Apps-Purchases-windows-latest.zip
             ./dist/Apps-Purchases-ubuntu-latest.zip
             ./dist/Apps-Purchases-macos-latest.zip
+          repository: ${{ github.repository }}
