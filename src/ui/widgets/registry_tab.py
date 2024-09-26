@@ -9,9 +9,9 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QHBoxLayout, QHeaderView, QTableView, QVBoxLayout, QWidget
 
-from backend.controllers.dashboard_controller import parse_data
-from ui.widgets.pandas_table import PandasTableModel
-from utils.config import AppConfig
+from src.backend.controllers.dashboard_controller import parse_data
+from src.ui.widgets.pandas_table import PandasTableModel
+from src.utils.config import AppConfig
 
 
 class RegistryTab(QWidget):

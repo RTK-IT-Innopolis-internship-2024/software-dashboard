@@ -2,7 +2,7 @@ import pandas as pd
 from PyQt6.QtCore import QAbstractTableModel, Qt, QVariant
 from PyQt6.QtGui import QFont
 
-from utils.config import AppConfig
+from src.utils.config import AppConfig
 
 
 class PandasTableModel(QAbstractTableModel):

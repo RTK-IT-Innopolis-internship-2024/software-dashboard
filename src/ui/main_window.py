@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QMainWindow, QTabWidget, QVBoxLayout, QWidget
 
-from ui.widgets.registry_tab import RegistryTab
-from utils.config import AppConfig
+from src.ui.widgets.registry_tab import RegistryTab
+from src.utils.config import AppConfig
 
 
 class MainWindow(QMainWindow):

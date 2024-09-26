@@ -9,7 +9,7 @@ class AppConfig:
 
     APP_NAME: str = "БФТ-КПЭ"
 
-    APP_ROOT: Path = Path(sys.argv[0]).resolve().parent.parent
+    APP_ROOT: Path = Path(sys.argv[0]).resolve().parent
     FONT_SIZE: int = 12
 
     @classmethod
