@@ -78,19 +78,16 @@ jobs:
         run: echo ${{ secrets.TOKEN }}
       - name: Check repository
         run: echo ${{ github.repository }}
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v2
+      - name: Create Release with GitHub CLI
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        with:
-          tag_name: ${{ env.current_date }}
-          name: Release ${{ env.current_date }}
-          body: ${{ needs.find_some_body.outputs.final_release_body }}
-          draft: false
-          prerelease: false
-          files: |-
-            ./dist/Apps-dashboard-windows-latest.zip
-            ./dist/Apps-dashboard-ubuntu-latest.zip
-            ./dist/Apps-dashboard-macos-latest.zip
-          repository: ${{ github.repository }}
+        run: |-
+          gh release create ${{ env.current_date }} \
+            ./dist/Apps-dashboard-windows-latest.zip \
+            ./dist/Apps-dashboard-ubuntu-latest.zip \
+            ./dist/Apps-dashboard-macos-latest.zip \
+            --repo ${{ github.repository }} \
+            --title "Release ${{ env.current_date }}" \
+            --notes "${{ needs.find_some_body.outputs.final_release_body }}" \
+            --draft=false \
+            --prerelease=false
