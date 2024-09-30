@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from PyQt6.QtCore import QUrl, pyqtSignal
 from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtWidgets import QWidget
 
 from src.utils import utils
 from src.utils.config import AppConfig
@@ -12,7 +13,7 @@ class PlotWidget(QWebEngineView):
 
     def __init__(
         self,
-        parent: object | None = None,
+        parent: QWidget | None = None,
         name: str = "registry",
         colors: list[str] | None = None,
         tick_font_size: int = 15,
@@ -32,7 +33,7 @@ class PlotWidget(QWebEngineView):
         min_width: int = 1000,
         min_height: int = 600,
     ) -> None:
-        super().__init__(parent)
+        super().__init__(parent=parent)
 
         # Customizable properties
         self.name: str = name
@@ -70,7 +71,7 @@ class PlotWidget(QWebEngineView):
         column_names: list[str],
         singular_title_template: str,
         legend_title: str,
-        parent: object | None = None,
+        parent: QWidget | None = None,
     ) -> "PlotWidget":
         """Alternative constructor that pulls default values from a config"""
         return cls(
