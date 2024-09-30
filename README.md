@@ -2,9 +2,9 @@
 ![ubuntu](https://github.com/RTK-IT-Innopolis-internship-2024/software-dashboard/actions/workflows/ubuntu-build.yml/badge.svg?branch=main)
 ![macos](https://github.com/RTK-IT-Innopolis-internship-2024/software-dashboard/actions/workflows/macos-build.yml/badge.svg?branch=main)
 
+![GitHub Last Commit](https://img.shields.io/github/last-commit/RTK-IT-Innopolis-internship-2024/software-dashboard)
 ![GitHub Releases](https://img.shields.io/github/v/release/RTK-IT-Innopolis-internship-2024/software-dashboard)
 ![Release Date](https://img.shields.io/github/release-date/RTK-IT-Innopolis-internship-2024/software-dashboard?style=flat&label=Release%20Date&format=%25d.%25m.%25Y)
-![GitHub Last Commit](https://img.shields.io/github/last-commit/RTK-IT-Innopolis-internship-2024/software-dashboard)
 
 # 1. Инструкция для пользователя:
 
