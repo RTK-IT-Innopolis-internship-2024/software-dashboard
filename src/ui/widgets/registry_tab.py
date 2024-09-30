@@ -1,172 +1,107 @@
-import typing
-from pathlib import Path
+from collections.abc import Callable
 
-if typing.TYPE_CHECKING:
-    import pandas as pd
-import plotly
-import plotly.graph_objects as go
-from PyQt6.QtCore import Qt
-from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtWidgets import QHBoxLayout, QHeaderView, QTableView, QVBoxLayout, QWidget
+import pandas as pd
+from PyQt6.QtCore import Qt, pyqtBoundSignal
+from PyQt6.QtWidgets import QHBoxLayout, QScrollArea, QSplitter, QVBoxLayout, QWidget
 
-from src.backend.controllers.dashboard_controller import parse_data
-from src.ui.widgets.pandas_table import PandasTableModel
+from src.ui.widgets.pandas_table import CheckableTableView
+from src.ui.widgets.plot_widget import PlotWidget
+from src.utils import utils
 from src.utils.config import AppConfig
 
 
 class RegistryTab(QWidget):
-    def __init__(self, parent=None) -> None:
+    def __init__(self, parent=None, on_filter_changed: pyqtBoundSignal | None = None, data_getter: Callable[[], pd.DataFrame] | None = None) -> None:
         super().__init__(parent)
         layout = QVBoxLayout(self)
+        self.data_getter = data_getter
 
         # Main Table and plot
         self.table = self.create_table()
+        self.table.checked_updated.connect(self.update_plot)
         self.plot = self.create_plot()
 
-        content_layout = QHBoxLayout()
-        content_layout.addWidget(self.table)
-        content_layout.addWidget(self.plot, stretch=1)
+        self.scroll_plot_area = QScrollArea(self)
+        self.scroll_plot_area.setWidgetResizable(True)
+        self.scroll_plot_area.setWidget(self.plot)
+        self.scroll_plot_area.setMinimumWidth(AppConfig.SCROLL_AREA_MIN_WIDTH)
+        self.scroll_plot_area.setMinimumHeight(AppConfig.SCROLL_AREA_MIN_HEIGHT)
 
-        layout.addLayout(content_layout)
+        content_layout = QHBoxLayout()
+        self.splitter = QSplitter(Qt.Orientation.Horizontal, self)
+        self.splitter.setOpaqueResize(False)
+        self.splitter.addWidget(self.table)
+        self.splitter.addWidget(self.scroll_plot_area)
+        self.splitter.splitterMoved.connect(self.splitter_changed)
+        self.table_min = True
+
+        content_layout.addWidget(self.splitter, stretch=1)
+        layout.addLayout(content_layout, stretch=1)
+
+        if on_filter_changed is not None:
+            on_filter_changed.connect(self.refresh)
+
+        self.on_resize()
+
+    def resizeEvent(self, event) -> None:  # noqa: N802
+        super().resizeEvent(event)
+        self.on_resize()
+
+    def splitter_changed(self) -> None:
+        self.table_min = self.splitter.sizes()[0] == AppConfig.TABLE_MINIMUM_WIDTH
+
+    def on_resize(self) -> None:
+        if self.table_min:
+            self.splitter.setSizes([AppConfig.TABLE_MINIMUM_WIDTH, self.width() - AppConfig.TABLE_MINIMUM_WIDTH])
 
     def initialize(self) -> None:
         self.load_data()
         self.update_data()
 
-    def create_table(self) -> QTableView:
-        table = QTableView(self)
-        table.setMinimumWidth(490)
-        font = table.font()
-        font.setPointSize(AppConfig.FONT_SIZE)  # Increase font size
-        table.setFont(font)
-        return table
+    def create_table(self) -> CheckableTableView:
+        return CheckableTableView(self, minimum_width=AppConfig.TABLE_MINIMUM_WIDTH)
 
     # plot using plotly
-    def create_plot(self) -> QWebEngineView:
-        return QWebEngineView(self)
+    def create_plot(self) -> PlotWidget:
+        return PlotWidget.from_config(
+            name="registry",
+            title_template="Выполнение КПЭ по классам",
+            x_axis_title="Классы",
+            y_axis_title="Процент",
+            column_names=["Нет в реестре", "Есть в реестре", "(пусто)"],
+            singular_title_template='Выполнение КПЭ по классу "{x}"',
+            legend_title="Наличие в реестре",
+            parent=self,
+        )
 
     def update_plot(self) -> None:
         if self.data is None:
             return
-
-        fig = go.Figure()
-
-        fig.add_trace(
-            go.Bar(
-                x=self.data.index,
-                y=self.data["Нет в реестре"],
-                name="Нет в реестре",
-                marker_color="rgb(220, 20, 60)",
-                text=self.data["Нет в реестре"].apply(lambda x: f"{x:.0%}"),
-                hovertemplate="%{x}<br>Нет в реестре: %{text}<extra></extra>",
-            )
-        )
-
-        fig.add_trace(
-            go.Bar(
-                x=self.data.index,
-                y=self.data["Есть в реестре"],
-                name="Есть в реестре",
-                marker_color="rgb(34, 139, 34)",
-                text=self.data["Есть в реестре"].apply(lambda x: f"{x:.0%}"),
-                hovertemplate="%{x}<br>Есть в реестре: %{text}<extra></extra>",
-            )
-        )
-
-        fig.add_trace(
-            go.Bar(
-                x=self.data.index,
-                y=self.data["(пусто)"],
-                name="(пусто)",
-                marker_color="rgb(200, 200, 200)",
-                text=self.data["(пусто)"].apply(lambda x: f"{x:.0%}"),
-                hovertemplate="%{x}<br>(пусто): %{text}<extra></extra>",
-            )
-        )
-
-        # Update the layout
-        fig.update_layout(
-            title="Выполнение КПЭ по классам",
-            xaxis={
-                "title": "Классы",
-                "tickangle": -45,
-            },
-            yaxis={
-                "title": "Процент",
-                "range": [0, 1.1],
-                "showticklabels": False,  # Hide the tick labels
-                "showgrid": False,  # Hide the grid
-                "zeroline": False,  # Hide the zero line
-            },
-            barmode="stack",
-            showlegend=True,
-            legend={"title": "Наличие в реестре"},
-            margin={"l": 40, "r": 40, "t": 40, "b": 120},
-            plot_bgcolor="rgba(0,0,0,0)",
-        )
-
-        # Display the plot
-        html = "<html><body>"
-        html += plotly.offline.plot(fig, output_type="div", include_plotlyjs="cdn")
-        html += "</body></html>"
-        self.plot.setHtml(html)
+        self.plot.update_plot(self.data, self.table.get_checked_mask())
 
     def set_table_model(self) -> None:
         if self.data is None:
             return
-        self.table.setModel(None)
-        model = PandasTableModel(self.data.map("{:.0%}".format), "Класс ИС ИМЗ")
-        self.table.setModel(model)
-        header = self.table.horizontalHeader()
-        if header is not None:
-            header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-            for i in range(1, len(self.data.columns) + 1):
-                self.table.setColumnWidth(i, 70)
-            header.setDefaultAlignment(Qt.AlignmentFlag.AlignCenter | Qt.TextFlag.TextWordWrap)
-            header.setMinimumHeight(int(30 * 2))
-            header.setMaximumSectionSize(250)
-            header.setStyleSheet(
-                "::section { background-color: #f0f0f0; border-width: 1px; border-style: solid; border-color: #b0b0b0 #b0b0b0 #b0b0b0 #f0f0f0; }"
-                "::section::first { background-color: #f0f0f0; border-width: 1px; border-style: solid; border-color: #b0b0b0 #b0b0b0 #b0b0b0 #b0b0b0; }"
-            )
-
-        vertical_header = self.table.verticalHeader()
-        if vertical_header is not None:
-            vertical_header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+        formatted_data = utils.format_percent(self.data, exclude=["Класс ИС ИМЗ / Наименование", "Кол-во систем"])
+        self.table.set_table_model(formatted_data, "Класс ИС ИМЗ")
 
     def update_data(self) -> None:
         self.set_table_model()
         self.update_plot()
 
-    def load_data(self) -> None:
-        head_list = [
-            "дата ввода в эксплуатацию",
-            "ит-ландшафт / наименование",
-            "инвентарный номер",
-            "класс ис имз / наименование",
-            "кпэ по классу в 2024",
-            "краткое наименование",
-            "наименование",
-            "план импортозамещения",
-            "Бюджет",
-            "наличие в реестре мин связи российского по",
-            "описание",
-            "наличие имз ос",
-            "наличие имз субд",
-            "наличие имз виртуализации",
-            "ответственный за развитие / фио",
-            "приказ о вводе в эксплуатацию",
-            "статус принадлежности к целевой архитектуре / наименование",
-            "технический владелец / фио",
-            "этап жц / наименование",
-            "код класса",
-        ]
-
-        file_path: Path = Path(AppConfig.get_some_path("example_inputs/Системы_Задача2_.xlsx"))
-
-        df: pd.DataFrame = parse_data(file_path=file_path, columns_list=head_list, sheet_name="Sheet0")
+    def load_data(self, status: str | None = None, stage: str | None = None) -> None:
+        if self.data_getter is None:
+            return
+        data_df: pd.DataFrame = self.data_getter()
+        if data_df.empty:
+            self.data = None
+            return
+        if status is not None and status != "(все)":
+            data_df = data_df[data_df["Статус принадлежности к целевой архитектуре / Наименование"] == status]
+        if stage is not None and stage != "(все)":
+            data_df = data_df[data_df["Этап ЖЦ / Наименование"] == stage]
         data = (
-            df[["Класс ИС ИМЗ / Наименование", "Наличие в реестре Мин связи российского ПО"]]
+            data_df[["Класс ИС ИМЗ / Наименование", "Наличие в реестре Мин связи российского ПО"]]
             .melt(id_vars="Класс ИС ИМЗ / Наименование")
             .fillna({"value": -1})
             .groupby(["Класс ИС ИМЗ / Наименование", "value"])
@@ -175,12 +110,31 @@ class RegistryTab(QWidget):
         data = data.groupby(level=0).transform(lambda x: x / x.sum())
         data = data.unstack()  # noqa: PD010
         data = data.rename_axis(index=None, columns=None)
+        if 0.0 not in data.columns:
+            data[0.0] = 0
+        if 1.0 not in data.columns:
+            data[1.0] = 0
+        if -1.0 not in data.columns:
+            data[-1.0] = 0
         data = data[[0.0, 1.0, -1.0]]
         data = data.rename(columns={-1.0: "(пусто)", 0.0: "Нет в реестре", 1.0: "Есть в реестре"})
         data = data.fillna(0)
 
+        system_count = data_df.groupby("Класс ИС ИМЗ / Наименование").size()
+        data["Кол-во систем"] = system_count
+        idx = data.index.to_list()
+        if "(пусто)" in idx:
+            idx.remove("(пусто)")
+            idx.insert(0, "(пусто)")
+        data = data.reindex(idx)
+
         self.data = data
 
-    def on_refresh_clicked(self) -> None:
-        self.load_data()
+    def refresh(self, status: str | None = None, stage: str | None = None) -> None:
+        self.load_data(status, stage)
         self.update_data()
+
+    def export_plot(self, file_path: str) -> None:
+        if self.data is None:
+            return
+        self.plot.export_plot(self.data, self.table.get_checked_mask(), file_path)
