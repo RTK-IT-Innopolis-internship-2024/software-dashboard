@@ -11,7 +11,7 @@
 ## Релиз приложения состоит из архива со следующим содержимым:
 
 ├── 📁 Apps-Purchases-<your_platform_name>-latest/  
-│   └── 🖥️ Apps-Purchases-<your_platform_name>-latest.exe  
+│   └── 🖥️ Apps-Purchases-<your_platform_name> 
 
 # 2. Instructions for developers:
 
@@ -104,10 +104,10 @@ pip install .
 pre-commit install
 ```
 
-### Open `./src` and just code it
+### Open `./src` or `main.py` and just code it
 
 ### Open your app
 
 ```shell
-python src/main.py
+python main.py
 ```
