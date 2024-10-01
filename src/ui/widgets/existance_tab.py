@@ -107,17 +107,28 @@ class ExistanceTab(QWidget):
         self.set_table_model()
         self.update_plot()
 
-    def load_data(self, status: str | None = None, stage: str | None = None) -> None:
+    def load_data(
+        self, status: list[str] | None = None, stage: list[str] | None = None, landscape: list[str] | None = None, import_type: list[str] | None = None
+    ) -> None:
         if self.data_getter is None:
             return
         data_df: pd.DataFrame = self.data_getter()
         if data_df.empty:
             self.data = None
             return
-        if status is not None and status != "(все)":
-            data_df = data_df[data_df["Статус принадлежности к целевой архитектуре / Наименование"] == status]
-        if stage is not None and stage != "(все)":
-            data_df = data_df[data_df["Этап ЖЦ / Наименование"] == stage]
+        if status is not None:
+            data_df = data_df[data_df["Статус принадлежности к целевой архитектуре / Наименование"].isin(status)]
+        if stage is not None:
+            data_df = data_df[data_df["Этап ЖЦ / Наименование"].isin(stage)]
+        if landscape is not None:
+            data_df = data_df[data_df["ИТ-ландшафт / Наименование"].isin(landscape)]
+        if import_type is not None:
+            data_df = data_df[data_df["Целевая ИС для задач импортозамещения"].isin(import_type)]
+
+        if data_df.empty:
+            self.data = pd.DataFrame(columns=["Нет", "Да", "В разработке", "Не используется", "(пусто)"])
+            return
+
         data = (
             data_df[["Класс ИС ИМЗ / Наименование", self.existance_column_name]].melt(id_vars="Класс ИС ИМЗ / Наименование").fillna({"value": "(пусто)"})
         )
@@ -153,8 +164,10 @@ class ExistanceTab(QWidget):
 
         self.data = data
 
-    def refresh(self, status: str | None = None, stage: str | None = None) -> None:
-        self.load_data(status, stage)
+    def refresh(
+        self, status: list[str] | None = None, stage: list[str] | None = None, landscape: list[str] | None = None, import_type: list[str] | None = None
+    ) -> None:
+        self.load_data(status, stage, landscape, import_type)
         self.update_data()
 
     def export_plot(self, file_path: str) -> None:

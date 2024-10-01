@@ -1,6 +1,8 @@
-from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtCore import QModelIndex, QSize, Qt
+from PyQt6.QtGui import QAction, QIcon, QStandardItemModel
 from PyQt6.QtWidgets import QComboBox, QLabel, QSizePolicy, QToolBar, QWidget
+
+from src.ui.widgets.multiselect_combobox import CustomMultiSelectComboBox
 
 
 class ToolBar(QToolBar):
@@ -50,6 +52,53 @@ class ToolBar(QToolBar):
         combo_box = QComboBox(self)
         combo_box.addItems(options)
         combo_box.currentIndexChanged.connect(on_change)  # Connect change event
+
+        self.add_label(label)
+        self.add_fixed_separator(10)
+        self.addWidget(combo_box)  # Add the combo box to the toolbar
+
+    def add_multiselect_option_list(self, label: str, options: list[str], on_change) -> None:
+        combo_box = CustomMultiSelectComboBox(self)
+        combo_box.addItems(options)
+        combo_box.setCurrentIndexes(list(range(len(options))))
+
+        def model() -> QStandardItemModel:
+            return combo_box.model()
+
+        selecting = False
+
+        def on_data_changed(x: QModelIndex):
+            nonlocal selecting
+            changed = True
+            item_0 = model().item(0)
+            if item_0 is None:
+                return
+            if x.row() == 0:
+                selecting = True
+                if item_0.checkState() == Qt.CheckState.Checked:
+                    if len(combo_box.getCurrentIndexes()) == len(options):
+                        changed = False
+                    combo_box.setCurrentIndexes(list(range(len(options))))
+                else:
+                    if len(combo_box.getCurrentIndexes()) == 0:
+                        changed = False
+                    combo_box.setCurrentIndexes([])
+                selecting = False
+            if not selecting and changed:
+                data_list = combo_box.currentData()
+                if "(все)" in data_list:
+                    data_list.remove("(все)")
+                on_change(data_list)
+            if all(combo_box.checked_mask()) and item_0.checkState() != Qt.CheckState.Checked:
+                selecting = True
+                item_0.setCheckState(Qt.CheckState.Checked)
+                selecting = False
+            elif not any(combo_box.checked_mask()) and item_0.checkState() != Qt.CheckState.Unchecked:
+                selecting = True
+                item_0.setCheckState(Qt.CheckState.Unchecked)
+                selecting = False
+
+        model().dataChanged.connect(on_data_changed)  # Connect change event
 
         self.add_label(label)
         self.add_fixed_separator(10)

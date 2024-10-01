@@ -463,6 +463,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pyqt6-multiselect-combobox"
+version = "1.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyqt6" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/86/71/fc8b0877426543879d27b303ccf819059c17b6cc21f38dc16a6cf35c9084/pyqt6-multiselect-combobox-1.1.1.tar.gz", hash = "sha256:08f2a334f337fe65d44d96efd7fda343d3792540caab9c5869a8ce9166e237c0", size = 6107 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fb/27/9d5097f84c9f203756a7bbbfa144d3c396e6986e0f3ca34603b8594359eb/pyqt6_multiselect_combobox-1.1.1-py3-none-any.whl", hash = "sha256:8e872c6bb3f4e3b37072e5695b77c787acc01a9aa42e9f2688113707344a465c", size = 6710 },
+]
+
+[[package]]
 name = "pyqt6-qt6"
 version = "6.7.2"
 source = { registry = "https://pypi.org/simple" }
@@ -671,6 +683,7 @@ dependencies = [
     { name = "pybind11" },
     { name = "pyinstaller" },
     { name = "pyqt6" },
+    { name = "pyqt6-multiselect-combobox" },
     { name = "pyqt6-webengine" },
     { name = "ruff" },
     { name = "setuptools" },
@@ -691,6 +704,7 @@ requires-dist = [
     { name = "pybind11", specifier = ">=2.13.5" },
     { name = "pyinstaller", specifier = ">=6.10.0" },
     { name = "pyqt6", specifier = ">=6.7.1" },
+    { name = "pyqt6-multiselect-combobox", specifier = ">=1.1.1" },
     { name = "pyqt6-webengine", specifier = ">=6.7.0" },
     { name = "ruff", specifier = ">=0.6.7" },
     { name = "setuptools", specifier = ">=74.0.0" },
