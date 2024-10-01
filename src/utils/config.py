@@ -108,6 +108,19 @@ class AppConfig:
             raise KeyError(f"Parameter '{name}' is not registered")
 
     @classmethod
+    def reset_param(cls, name: str):
+        """
+        Reset the value of a configuration parameter to its default and save it to the file.
+        :param name: The name of the parameter.
+        :raises: Exception if the parameter is not found or not registered.
+        """
+        if name in cls.config_info:
+            cls.config_params[name] = cls.config_info[name].default
+            cls.save_config()
+        else:
+            raise KeyError(f"Parameter '{name}' is not registered")
+
+    @classmethod
     def save_config(cls) -> None:
         """Save the configuration parameters to the config file."""
         with cls.CONFIG_FILE.open("w", encoding="utf-8") as f:

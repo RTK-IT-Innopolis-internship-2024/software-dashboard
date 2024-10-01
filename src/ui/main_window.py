@@ -15,12 +15,14 @@ from src.utils.config import AppConfig
 
 
 class MainWindow(QMainWindow):
-    filter_changed = pyqtSignal(str, str)
+    filter_changed = pyqtSignal(list, list, list, list)
 
     def __init__(self) -> None:
         super().__init__()
-        self.current_status_idx: int = 0
-        self.current_stage_idx: int = 0
+        self.current_status: list[str] = []
+        self.current_stage: list[str] = []
+        self.current_landscape: list[str] = []
+        self.current_import: list[str] = []
         self.data = pd.DataFrame()
         self.setWindowTitle(AppConfig.APP_NAME)
         self.setGeometry(50, 50, 1200, 900)
@@ -76,29 +78,46 @@ class MainWindow(QMainWindow):
         try:
             # Load file path and data
             file_path: Path = AppConfig.get_param("data_path")
+            while file_path == "":
+                self.show_info_dialog("Не выбран файл", "Пожалуйста, выберите файл.")
+                self.load_document(initialize=False)
+                file_path = AppConfig.get_param("data_path")
             data: pd.DataFrame = parse_data_sheet0(file_path)
             self.data = data
 
         except FileNotFoundError:
-            # Handle the case where the file is not found (in Russian)
             self.show_error_dialog(
                 "Ошибка: Файл не найден", f"Файл <i>{file_path!s}</i> не существует. Пожалуйста, проверьте правильность пути или выберите другой файл."
             )
+            AppConfig.reset_param("data_path")
 
         except pd.errors.EmptyDataError:
-            # Handle empty data file error (in Russian)
             self.show_error_dialog("Ошибка: Пустой файл данных", f"Файл <i>{file_path!s}</i> пуст. Пожалуйста, убедитесь, что файл содержит данные.")
+            AppConfig.reset_param("data_path")
+
+        except pd.errors.ParserError:
+            self.show_error_dialog(
+                "Ошибка: Некорректный файл данных",
+                f"Файл <i>{file_path!s}</i> имеет некорректные данные. Пожалуйста, проверьте правильность данных в файле.",
+            )
+            AppConfig.reset_param("data_path")
+
+        except ValueError as e:
+            self.show_error_dialog(
+                "Ошибка: Некорректный файл данных",
+                f"Файл <i>{file_path!s}</i> имеет некорректные данные.<br>{e!s}",
+            )
+            AppConfig.reset_param("data_path")
 
         except Exception as e:  # noqa: BLE001
-            # Catch all other exceptions and display unknown error message
             self.show_error_dialog(
                 "Неизвестная ошибка", f"Произошла неизвестная ошибка с файлом <i>{file_path!s}</i>:<br><span style='color:red'>{e!s}</span>"
             )
+            AppConfig.reset_param("data_path")
 
         else:
             return
 
-        # Return empty DataFrame if any error occurs
         self.data = pd.DataFrame()
 
     def get_data(self) -> pd.DataFrame:
@@ -136,14 +155,14 @@ class MainWindow(QMainWindow):
         data: pd.DataFrame = self.get_data()
 
         if not data.empty and data is not None:
-            # Add option lists with fixed labels
             self.status_options = ["(все)", *data["Статус принадлежности к целевой архитектуре / Наименование"].unique()]
             if "(пусто)" in self.status_options:
                 self.status_options.remove("(пусто)")
                 self.status_options.append("(пусто)")
-            self.topbar.add_option_list(
+            self.current_status = self.status_options.copy()
+            self.topbar.add_multiselect_option_list(
                 "Целевая архитектура",
-                self.status_options,  # Replace with actual options
+                self.status_options,
                 self.on_status_change,
             )
 
@@ -153,30 +172,67 @@ class MainWindow(QMainWindow):
             if "(пусто)" in self.stage_options:
                 self.stage_options.remove("(пусто)")
                 self.stage_options.append("(пусто)")
-            self.topbar.add_option_list(
+            self.current_stage = self.stage_options.copy()
+            self.topbar.add_multiselect_option_list(
                 "Этап ЖЦ",
-                self.stage_options,  # Replace with actual stages
+                self.stage_options,
                 self.on_stage_change,
             )
 
+            self.topbar.add_fixed_separator(30)
+
+            self.landscape_options = ["(все)", *data["ИТ-ландшафт / Наименование"].unique()]
+            if "(пусто)" in self.landscape_options:
+                self.landscape_options.remove("(пусто)")
+                self.landscape_options.append("(пусто)")
+            self.current_landscape = self.landscape_options.copy()
+            self.topbar.add_multiselect_option_list(
+                "ИТ-ландшафт",
+                self.landscape_options,
+                self.on_landscape_change,
+            )
+
+            self.topbar.add_fixed_separator(30)
+
+            self.import_options = ["(все)", *data["Целевая ИС для задач импортозамещения"].unique()]
+            if "(пусто)" in self.import_options:
+                self.import_options.remove("(пусто)")
+                self.import_options.append("(пусто)")
+            self.current_import = self.import_options.copy()
+            self.topbar.add_multiselect_option_list(
+                "Целевая ИС",
+                self.import_options,
+                self.on_import_change,
+            )
+
         self.topbar.add_separator()
-        self.topbar.add_button("Загрузить данные", AppConfig.get_resource_path("resources/assets/icons/windows/shell32-276.ico"), self.load_document)
+        self.topbar.add_button(
+            "Загрузить данные", AppConfig.get_resource_path("resources/assets/icons/windows/shell32-276.ico"), lambda: self.load_document(initialize=True)
+        )
         self.topbar.add_button("Экспорт графика", AppConfig.get_resource_path("resources/assets/icons/windows/shell32-265.ico"), self.export_plot)
 
         self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.topbar)
 
-    def get_filter(self) -> tuple[str | None, str | None]:
-        return self.status_options[self.current_status_idx], self.stage_options[self.current_stage_idx]
+    def get_filter(self) -> tuple[list[str], list[str], list[str], list[str]]:
+        return (self.current_status, self.current_stage, self.current_landscape, self.current_import)
 
-    def on_status_change(self, index: int) -> None:
-        self.current_status_idx = index
+    def on_status_change(self, values: list[str]) -> None:
+        self.current_status = values
         self.filter_changed.emit(*self.get_filter())
 
-    def on_stage_change(self, index: int) -> None:
-        self.current_stage_idx = index
+    def on_stage_change(self, values: list[str]) -> None:
+        self.current_stage = values
         self.filter_changed.emit(*self.get_filter())
 
-    def load_document(self) -> None:
+    def on_landscape_change(self, values: list[str]) -> None:
+        self.current_landscape = values
+        self.filter_changed.emit(*self.get_filter())
+
+    def on_import_change(self, values: list[str]) -> None:
+        self.current_import = values
+        self.filter_changed.emit(*self.get_filter())
+
+    def load_document(self, initialize: bool = True) -> None:  # noqa: FBT001, FBT002
         """
         Opens a file dialog to select an .xlsx file. If a valid file is selected,
         updates the 'data_path' configuration. Displays an error dialog for invalid files.
@@ -185,9 +241,9 @@ class MainWindow(QMainWindow):
         file_dialog = QFileDialog()
         file_path, _ = file_dialog.getOpenFileName(
             None,
-            "Выберите файл",  # Russian for "Select file"
+            "Выберите файл",
             AppConfig.get_param("data_path"),  # Start path
-            "Excel Files (*.xlsx)",  # Filter for .xlsx files
+            "Excel Files (*.xlsx)",
         )
 
         if file_path:  # If a file was selected
@@ -198,10 +254,9 @@ class MainWindow(QMainWindow):
                 # Update the 'data_path' parameter
                 try:
                     AppConfig.set_param("data_path", str(selected_file))
-                    self.show_info_dialog("Файл загружен", f"Путь к файлу изменен на: {selected_file}")
-                    self.initialize()
+                    if initialize:
+                        self.initialize()
                 except Exception as e:  # noqa: BLE001
-                    # Handle unexpected errors while setting the parameter
                     self.show_error_dialog("Ошибка", f"Не удалось обновить путь к файлу:<br><span style='color:red'>{e!s}</span>")
             else:
                 # If the file is not an .xlsx file, show an error dialog
@@ -238,7 +293,7 @@ class MainWindow(QMainWindow):
             file_dialog = QFileDialog()
             file_path, _ = file_dialog.getSaveFileName(
                 None,
-                "Сохранить график как",  # Russian for "Save plot as"
+                "Сохранить график как",
                 default_file_name,
                 "PNG Files (*.png)",  # Filter to PNG files
             )

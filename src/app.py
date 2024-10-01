@@ -20,7 +20,7 @@ def initialize_params() -> None:
     """
     Initializes the application parameters.
     """
-    AppConfig.register_param("data_path", AppConfig.get_some_path("example_inputs/Системы_Задача2_.xlsx"), "Path to the data file")
+    AppConfig.register_param("data_path", "", "Path to the data file")
     AppConfig.initialize()
 
 
