@@ -8,10 +8,20 @@
 
 # 1. Инструкция для пользователя:
 
-## Релиз приложения состоит из архива со следующим содержимым:
+## Инструкция по установке
 
-├── 📁 Apps-Purchases-<your_platform_name>-latest/  
-│   └── 🖥️ Apps-Purchases-<your_platform_name> 
+1. Перейдите в раздел [Releases](https://github.com/RTK-IT-Innopolis-internship-2024/software-dashboard/releases/latest) и выбирите самый новый релиз.
+2. Скачайте архив с приложением для вашей платформы. Например, для Windows [Apps-dashboard-windows-latest.zip](https://github.com/RTK-IT-Innopolis-internship-2024/software-dashboard/releases/latest/download/Apps-dashboard-windows-latest.zip).
+3. Распакуйте папку `Apps-dashboard-<your_platform_name>-latest` из архива в любое место.
+
+    **Важно:** Файлы внутри папки должны оставаться в отдельной папке для корректной работы.
+
+4. Перейдите в папку `Apps-dashboard-<your_platform_name>-latest` и запустите приложение.
+5. Выбирите `.xlsx` файл с данными.
+
+## Инструкция по использованию
+
+https://github.com/user-attachments/assets/99c86196-7a74-4367-8360-9cee73a7ffaa
 
 # 2. Instructions for developers:
 
