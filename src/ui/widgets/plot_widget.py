@@ -77,24 +77,37 @@ class PlotWidget(QWebEngineView):
         return cls(
             parent=parent,
             name=name,
-            colors=[AppConfig.PLOT_RED_COLOR, AppConfig.PLOT_GREEN_COLOR, AppConfig.PLOT_GRAY_COLOR],
-            tick_font_size=AppConfig.PLOT_TICK_FONT_SIZE,
-            legend_font_size=AppConfig.PLOT_LEGEND_FONT_SIZE,
-            title_font_size=AppConfig.PLOT_TITLE_FONT_SIZE,
-            hover_font_size=AppConfig.PLOT_HOVER_FONT_SIZE,
-            text_info_font_size=AppConfig.PLOT_TEXT_INFO_FONT_SIZE,
+            colors=[AppConfig.get_param("plot_red_color"), AppConfig.get_param("plot_green_color"), AppConfig.get_param("plot_gray_color")],
+            tick_font_size=AppConfig.get_param("plot_tick_font_size"),
+            legend_font_size=AppConfig.get_param("plot_legend_font_size"),
+            title_font_size=AppConfig.get_param("plot_title_font_size"),
+            hover_font_size=AppConfig.get_param("plot_hover_font_size"),
+            text_info_font_size=AppConfig.get_param("plot_text_info_font_size"),
             title_template=title_template,
             x_axis_title=x_axis_title,
             y_axis_title=y_axis_title,
             column_names=column_names,
-            truncate_len=AppConfig.PLOT_TRUNCATE_LEN,
+            truncate_len=AppConfig.get_param("plot_truncate_len"),
             singular_title_template=singular_title_template,
             legend_title=legend_title,
             margins=AppConfig.PLOT_MARGINS,
-            background_color=AppConfig.PLOT_BACKGROUND_COLOR,
-            min_width=AppConfig.PLOT_MIN_WIDTH,
-            min_height=AppConfig.PLOT_MIN_HEIGHT,
+            background_color=AppConfig.get_param("plot_background_color"),
+            min_width=AppConfig.get_param("plot_min_width"),
+            min_height=AppConfig.get_param("plot_min_height"),
         )
+
+    def reset_config(self) -> None:
+        self.colors = [AppConfig.get_param("plot_red_color"), AppConfig.get_param("plot_green_color"), AppConfig.get_param("plot_gray_color")]
+        self.tick_font_size = AppConfig.get_param("plot_tick_font_size")
+        self.legend_font_size = AppConfig.get_param("plot_legend_font_size")
+        self.title_font_size = AppConfig.get_param("plot_title_font_size")
+        self.hover_font_size = AppConfig.get_param("plot_hover_font_size")
+        self.text_info_font_size = AppConfig.get_param("plot_text_info_font_size")
+        self.truncate_len = AppConfig.get_param("plot_truncate_len")
+        self.margins = AppConfig.PLOT_MARGINS
+        self.background_color = AppConfig.get_param("plot_background_color")
+        self.min_width = AppConfig.get_param("plot_min_width")
+        self.min_height = AppConfig.get_param("plot_min_height")
 
     def make_plot(self, data: pd.DataFrame, mask: pd.Series, width: int | None = None, height: int | None = None) -> tuple[go.Figure, bool]:
         """Updates the plot based on the data and the provided mask."""
@@ -218,7 +231,7 @@ class PlotWidget(QWebEngineView):
         if data is None:
             return
 
-        fig, _ = self.make_plot(data, mask, width=AppConfig.EXPORT_PLOT_WIDTH, height=AppConfig.EXPORT_PLOT_HEIGHT)
+        fig, _ = self.make_plot(data, mask, width=AppConfig.get_param("export_plot_width"), height=AppConfig.get_param("export_plot_height"))
 
         # Save plot and load it in the widget
         utils.export_plotly_plot(fig, file_path)

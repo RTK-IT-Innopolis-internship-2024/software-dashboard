@@ -4,13 +4,15 @@ from pathlib import Path
 
 import pandas as pd
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtWidgets import QFileDialog, QMainWindow, QMessageBox, QProgressDialog, QTabWidget, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QFileDialog, QMainWindow, QProgressDialog, QTabWidget, QVBoxLayout, QWidget
 
 from src.backend.controllers.dashboard_controller import parse_data_sheet0
 from src.ui.widgets.dashboard_tab import DashboardTab
 from src.ui.widgets.existance_tab import ExistanceTab
 from src.ui.widgets.registry_tab import RegistryTab
+from src.ui.widgets.settings_window import SettingsWindow
 from src.ui.widgets.toolbar import ToolBar
+from src.utils import utils
 from src.utils.config import AppConfig
 
 
@@ -79,38 +81,38 @@ class MainWindow(QMainWindow):
             # Load file path and data
             file_path: Path = AppConfig.get_param("data_path")
             while file_path == "":
-                self.show_info_dialog("Не выбран файл", "Пожалуйста, выберите файл.")
+                utils.show_info_dialog("Не выбран файл", "Пожалуйста, выберите файл.")
                 self.load_document(initialize=False)
                 file_path = AppConfig.get_param("data_path")
             data: pd.DataFrame = parse_data_sheet0(file_path)
             self.data = data
 
         except FileNotFoundError:
-            self.show_error_dialog(
+            utils.show_error_dialog(
                 "Ошибка: Файл не найден", f"Файл <i>{file_path!s}</i> не существует. Пожалуйста, проверьте правильность пути или выберите другой файл."
             )
             AppConfig.reset_param("data_path")
 
         except pd.errors.EmptyDataError:
-            self.show_error_dialog("Ошибка: Пустой файл данных", f"Файл <i>{file_path!s}</i> пуст. Пожалуйста, убедитесь, что файл содержит данные.")
+            utils.show_error_dialog("Ошибка: Пустой файл данных", f"Файл <i>{file_path!s}</i> пуст. Пожалуйста, убедитесь, что файл содержит данные.")
             AppConfig.reset_param("data_path")
 
         except pd.errors.ParserError:
-            self.show_error_dialog(
+            utils.show_error_dialog(
                 "Ошибка: Некорректный файл данных",
                 f"Файл <i>{file_path!s}</i> имеет некорректные данные. Пожалуйста, проверьте правильность данных в файле.",
             )
             AppConfig.reset_param("data_path")
 
         except ValueError as e:
-            self.show_error_dialog(
+            utils.show_error_dialog(
                 "Ошибка: Некорректный файл данных",
                 f"Файл <i>{file_path!s}</i> имеет некорректные данные.<br>{e!s}",
             )
             AppConfig.reset_param("data_path")
 
         except Exception as e:  # noqa: BLE001
-            self.show_error_dialog(
+            utils.show_error_dialog(
                 "Неизвестная ошибка", f"Произошла неизвестная ошибка с файлом <i>{file_path!s}</i>:<br><span style='color:red'>{e!s}</span>"
             )
             AppConfig.reset_param("data_path")
@@ -123,24 +125,6 @@ class MainWindow(QMainWindow):
     def get_data(self) -> pd.DataFrame:
         return self.data
 
-    # Method to show error dialog
-    def show_error_dialog(self, title: str, message: str) -> None:
-        error_dialog = QMessageBox()
-        error_dialog.setIcon(QMessageBox.Icon.Critical)
-        error_dialog.setWindowTitle(title)
-        error_dialog.setText(message)
-        error_dialog.setStandardButtons(QMessageBox.StandardButton.Ok)
-        error_dialog.exec()
-
-    def show_info_dialog(self, title: str, message: str) -> None:
-        """Show an informational dialog with the given title and message."""
-        info_dialog = QMessageBox()
-        info_dialog.setIcon(QMessageBox.Icon.Information)
-        info_dialog.setWindowTitle(title)
-        info_dialog.setText(message)
-        info_dialog.setStandardButtons(QMessageBox.StandardButton.Ok)
-        info_dialog.exec()
-
     def create_toolbar(self) -> None:
         if self.topbar is not None:
             self.removeToolBar(self.topbar)
@@ -149,7 +133,7 @@ class MainWindow(QMainWindow):
             orientation=Qt.Orientation.Horizontal,
             style=Qt.ToolButtonStyle.ToolButtonTextUnderIcon,
             icon_size=(30, 30),
-            font_size=AppConfig.FONT_SIZE,
+            font_size=AppConfig.get_param("font_size"),
         )
 
         data: pd.DataFrame = self.get_data()
@@ -210,8 +194,14 @@ class MainWindow(QMainWindow):
             "Загрузить данные", AppConfig.get_resource_path("resources/assets/icons/windows/shell32-276.ico"), lambda: self.load_document(initialize=True)
         )
         self.topbar.add_button("Экспорт графика", AppConfig.get_resource_path("resources/assets/icons/windows/shell32-265.ico"), self.export_plot)
+        self.topbar.add_button("Настройки", AppConfig.get_resource_path("resources/assets/icons/windows/shell32-315.ico"), self.open_settings)
 
         self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.topbar)
+
+    def open_settings(self) -> None:
+        self.settings_window = SettingsWindow(AppConfig.config_info, self)
+        self.settings_window.saved.connect(self.initialize)
+        self.settings_window.show()
 
     def get_filter(self) -> tuple[list[str], list[str], list[str], list[str]]:
         return (self.current_status, self.current_stage, self.current_landscape, self.current_import)
@@ -257,10 +247,10 @@ class MainWindow(QMainWindow):
                     if initialize:
                         self.initialize()
                 except Exception as e:  # noqa: BLE001
-                    self.show_error_dialog("Ошибка", f"Не удалось обновить путь к файлу:<br><span style='color:red'>{e!s}</span>")
+                    utils.show_error_dialog("Ошибка", f"Не удалось обновить путь к файлу:<br><span style='color:red'>{e!s}</span>")
             else:
                 # If the file is not an .xlsx file, show an error dialog
-                self.show_error_dialog("Неверный файл", "Выбранный файл не является файлом .xlsx. Пожалуйста, выберите файл с правильным расширением.")
+                utils.show_error_dialog("Неверный файл", "Выбранный файл не является файлом .xlsx. Пожалуйста, выберите файл с правильным расширением.")
         else:
             # If no file was selected, do nothing
             pass
@@ -278,7 +268,7 @@ class MainWindow(QMainWindow):
             active_tab_name = self.tabs.tabText(active_tab_index)
 
             if active_tab_index == self.tabs.count() - 1:
-                self.show_info_dialog("Не поддерживается", "Экспорт графиков для данной вкладки не поддерживается.")
+                utils.show_info_dialog("Не поддерживается", "Экспорт графиков для данной вкладки не поддерживается.")
                 return
 
             export_folder = Path(AppConfig.get_some_path("exports"))
@@ -305,7 +295,7 @@ class MainWindow(QMainWindow):
                 # Check if the file extension is '.png'
                 if selected_file.suffix != ".png":
                     # Show error if the file extension is not '.png'
-                    self.show_error_dialog("Неверный формат", "Пожалуйста, выберите файл с расширением .png.")
+                    utils.show_error_dialog("Неверный формат", "Пожалуйста, выберите файл с расширением .png.")
                     return
 
                 self.tab_list[active_tab_index].export_plot(str(selected_file))
@@ -314,11 +304,11 @@ class MainWindow(QMainWindow):
                 if selected_file.exists():
                     webbrowser.open(str(selected_file))
                 else:
-                    self.show_error_dialog("Ошибка экспорта", "Не удалось найти созданный файл после экспорта.")
+                    utils.show_error_dialog("Ошибка экспорта", "Не удалось найти созданный файл после экспорта.")
 
         except Exception as e:  # noqa: BLE001
             # Handle any other unexpected errors
-            self.show_error_dialog("Ошибка при экспорте", f"Произошла ошибка во время экспорта:<br><span style='color:red'>{e!s}</span>")
+            utils.show_error_dialog("Ошибка при экспорте", f"Произошла ошибка во время экспорта:<br><span style='color:red'>{e!s}</span>")
 
     def initialize(self) -> None:
         # Create a progress dialog

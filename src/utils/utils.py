@@ -6,6 +6,7 @@ from typing import Any
 import pandas as pd
 import plotly
 import plotly.graph_objects as go
+from PyQt6.QtWidgets import QMessageBox
 
 from src.utils.config import AppConfig
 
@@ -101,3 +102,22 @@ def create_plotly_plot(fig: go.Figure, file_name: str) -> str:
 def export_plotly_plot(fig: go.Figure, file_name: str) -> None:
     """Export plotly plot to png file."""
     fig.write_image(file_name, format="png")
+
+
+def show_error_dialog(title: str, message: str) -> None:
+    error_dialog = QMessageBox()
+    error_dialog.setIcon(QMessageBox.Icon.Critical)
+    error_dialog.setWindowTitle(title)
+    error_dialog.setText(message)
+    error_dialog.setStandardButtons(QMessageBox.StandardButton.Ok)
+    error_dialog.exec()
+
+
+def show_info_dialog(title: str, message: str) -> None:
+    """Show an informational dialog with the given title and message."""
+    info_dialog = QMessageBox()
+    info_dialog.setIcon(QMessageBox.Icon.Information)
+    info_dialog.setWindowTitle(title)
+    info_dialog.setText(message)
+    info_dialog.setStandardButtons(QMessageBox.StandardButton.Ok)
+    info_dialog.exec()

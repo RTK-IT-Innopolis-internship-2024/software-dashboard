@@ -47,15 +47,15 @@ class DashboardTab(QWidget):
         scroll_plot_area = QScrollArea(self)
         scroll_plot_area.setWidgetResizable(True)
         scroll_plot_area.setWidget(plot)
-        scroll_plot_area.setMinimumWidth(AppConfig.SCROLL_AREA_MIN_WIDTH_DASHBOARD)
-        scroll_plot_area.setMinimumHeight(AppConfig.SCROLL_AREA_MIN_HEIGHT_DASHBOARD)
+        scroll_plot_area.setMinimumWidth(AppConfig.get_param("scroll_area_min_width_dashboard"))
+        scroll_plot_area.setMinimumHeight(AppConfig.get_param("scroll_area_min_height_dashboard"))
 
         return scroll_plot_area
 
     # plot using plotly
     def create_plot(self, file_path: Path) -> QWebEngineView:
         plot = QWebEngineView(self)
-        plot.setMinimumSize(AppConfig.PLOT_MIN_WIDTH_DASHBOARD, AppConfig.PLOT_MIN_HEIGHT_DASHBOARD)
+        plot.setMinimumSize(AppConfig.get_param("plot_min_width_dashboard"), AppConfig.get_param("plot_min_height_dashboard"))
         if file_path.exists():
             plot.load(QUrl.fromLocalFile(str(file_path)))
 
@@ -68,7 +68,7 @@ class DashboardTab(QWidget):
     def update_plots(self, file_updated: str = "", is_pie: bool = False) -> None:  # noqa: FBT001, FBT002
         for i in range(4):
             if self.plot_paths[i].exists():
-                self.plots[i].setMinimumSize(AppConfig.PLOT_MIN_WIDTH_DASHBOARD, AppConfig.PLOT_MIN_HEIGHT_DASHBOARD)
+                self.plots[i].setMinimumSize(AppConfig.get_param("plot_min_width_dashboard"), AppConfig.get_param("plot_min_height_dashboard"))
                 if file_updated == str(self.plot_paths[i]) and is_pie:
                     self.plots[i].setMinimumSize(0, 0)
                 self.plots[i].load(QUrl.fromLocalFile(str(self.plot_paths[i])))
