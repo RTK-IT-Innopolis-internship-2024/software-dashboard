@@ -21,7 +21,7 @@
 
 ## Инструкция по использованию
 
-https://github.com/user-attachments/assets/99c86196-7a74-4367-8360-9cee73a7ffaa
+https://github.com/user-attachments/assets/299889e6-c6b9-4802-971a-bd1c02997e4b
 
 # 2. Instructions for developers:
 
