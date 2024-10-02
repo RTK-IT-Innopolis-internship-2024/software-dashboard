@@ -33,8 +33,8 @@ class ExistanceTab(QWidget):
         self.scroll_plot_area = QScrollArea(self)
         self.scroll_plot_area.setWidgetResizable(True)
         self.scroll_plot_area.setWidget(self.plot)
-        self.scroll_plot_area.setMinimumWidth(AppConfig.SCROLL_AREA_MIN_WIDTH)
-        self.scroll_plot_area.setMinimumHeight(AppConfig.SCROLL_AREA_MIN_HEIGHT)
+        self.scroll_plot_area.setMinimumWidth(AppConfig.get_param("scroll_area_min_width"))
+        self.scroll_plot_area.setMinimumHeight(AppConfig.get_param("scroll_area_min_height"))
 
         content_layout = QHBoxLayout()
         self.splitter = QSplitter(Qt.Orientation.Horizontal, self)
@@ -57,18 +57,29 @@ class ExistanceTab(QWidget):
         self.on_resize()
 
     def splitter_changed(self) -> None:
-        self.table_min = self.splitter.sizes()[0] == AppConfig.TABLE_MINIMUM_WIDTH
+        self.table_min = self.splitter.sizes()[0] == AppConfig.get_param("table_min_width")
 
     def on_resize(self) -> None:
         if self.table_min:
-            self.splitter.setSizes([AppConfig.TABLE_MINIMUM_WIDTH, self.width() - AppConfig.TABLE_MINIMUM_WIDTH])
+            self.splitter.setSizes([AppConfig.get_param("table_min_width"), self.width() - AppConfig.get_param("table_min_width")])
+
+    def reset_config(self) -> None:
+        self.plot.reset_config()
+        self.plot.colors = [
+            AppConfig.get_param("plot_red_color"),
+            AppConfig.get_param("plot_green_color"),
+            AppConfig.get_param("plot_orange_color"),
+            AppConfig.get_param("plot_dark_gray_color"),
+            AppConfig.get_param("plot_gray_color"),
+        ]
 
     def initialize(self) -> None:
+        self.reset_config()
         self.load_data()
         self.update_data()
 
     def create_table(self) -> CheckableTableView:
-        return CheckableTableView(self, minimum_width=AppConfig.TABLE_MINIMUM_WIDTH)
+        return CheckableTableView(self, minimum_width=AppConfig.get_param("table_min_width"))
 
     # plot using plotly
     def create_plot(self) -> PlotWidget:
@@ -83,11 +94,11 @@ class ExistanceTab(QWidget):
             parent=self,
         )
         plot.colors = [
-            AppConfig.PLOT_RED_COLOR,
-            AppConfig.PLOT_GREEN_COLOR,
-            AppConfig.PLOT_ORANGE_COLOR,
-            AppConfig.PLOT_DARK_GRAY_COLOR,
-            AppConfig.PLOT_GRAY_COLOR,
+            AppConfig.get_param("plot_red_color"),
+            AppConfig.get_param("plot_green_color"),
+            AppConfig.get_param("plot_orange_color"),
+            AppConfig.get_param("plot_dark_gray_color"),
+            AppConfig.get_param("plot_gray_color"),
         ]
 
         return plot

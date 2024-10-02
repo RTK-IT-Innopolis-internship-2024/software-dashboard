@@ -56,7 +56,7 @@ class CheckableTableView(QTableView):
         super().__init__(parent)
         self.setMinimumWidth(minimum_width)
         font = self.font()
-        font.setPointSize(AppConfig.FONT_SIZE)  # Increase font size
+        font.setPointSize(AppConfig.get_param("font_size"))  # Increase font size
         self.setFont(font)
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
@@ -178,7 +178,7 @@ class PandasTableModel(QAbstractTableModel):
     def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):  # noqa: N802
         if role == Qt.ItemDataRole.FontRole:
             font = QFont()
-            font.setPointSize(AppConfig.FONT_SIZE)  # Increase font size
+            font.setPointSize(AppConfig.get_param("font_size"))  # Increase font size
             return font
 
         if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:

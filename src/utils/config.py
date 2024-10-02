@@ -3,11 +3,47 @@ import sys
 from pathlib import Path
 from typing import Any, ClassVar
 
+from PyQt6.QtWidgets import QWidget
+
+
+class ParamEditWidget(QWidget):
+    def __init__(self, parent=None) -> None:
+        super().__init__(parent)
+        self.setContentsMargins(0, 0, 0, 0)
+
+    def get_value(self) -> Any:
+        """Get the current value from the input field."""
+        raise NotImplementedError
+
+    def set_value(self, value: Any):
+        """Set a value in the input field."""
+        raise NotImplementedError
+
 
 class ConfigParam:
-    def __init__(self, default: Any, description: str = ""):
+    def __init__(
+        self,
+        name: str,
+        default: Any,
+        label: str = "",
+        group: str = "",
+        tooltip: str = "",
+        edit_widget: type[ParamEditWidget] | ParamEditWidget | None = None,
+        require_reload: bool = False,  # noqa: FBT001, FBT002
+    ):
         self.default = default
-        self.description = description
+        self.name = name
+        self.label = label
+        self.group = group
+        self.tooltip = tooltip
+        self.edit_widget = edit_widget
+        self.require_reload = require_reload
+
+    def __repr__(self):
+        return f"ConfigParam(default={self.default}, name={self.name}, group={self.group}, tooltip={self.tooltip}, edit_widget={self.edit_widget})"
+
+    def __str__(self):
+        return f"ConfigParam(default={self.default}, name={self.name}, group={self.group}, tooltip={self.tooltip}, edit_widget={self.edit_widget})"
 
 
 class AppConfig:
@@ -21,46 +57,15 @@ class AppConfig:
     CONFIG_FILE: Path = APP_ROOT / "app_config.json"  # File to save configuration
 
     # Widget customization variables
-    FONT_SIZE: int = 12  # Font size for all widgets (does not affect plot widget)
-    TABLE_MINIMUM_WIDTH: int = 510
     WINDOW_MINIMIUM_SIZE: tuple[int, int] = (1200, 700)
 
     # Plot customization variables
-    PLOT_RED_COLOR: str = "rgb(220, 20, 60)"
-    PLOT_GREEN_COLOR: str = "rgb(0, 176, 80)"
-    PLOT_GRAY_COLOR: str = "rgb(200, 200, 200)"
-    PLOT_ORANGE_COLOR: str = "rgb(255, 140, 0)"
-    PLOT_DARK_GRAY_COLOR: str = "rgb(100, 100, 100)"
-    PLOT_BACKGROUND_COLOR: str = "rgba(0, 0, 0, 0)"  # transparent
-
-    PLOT_TICK_FONT_SIZE: int = 15
-    PLOT_LEGEND_FONT_SIZE: int = 15
-    PLOT_TITLE_FONT_SIZE: int = 22
-    PLOT_HOVER_FONT_SIZE: int = 16
-    PLOT_TEXT_INFO_FONT_SIZE: int = 14  # Used for info text in plot widget (e.g. "75%")
-
-    PLOT_TRUNCATE_LEN: int = 30
-
     PLOT_MARGINS: ClassVar[dict] = {"l": 40, "r": 40, "t": 40, "b": 40}
-
-    SCROLL_AREA_MIN_WIDTH: int = 600
-    SCROLL_AREA_MIN_HEIGHT: int = 600
-
-    SCROLL_AREA_MIN_WIDTH_DASHBOARD: int = 300
-    SCROLL_AREA_MIN_HEIGHT_DASHBOARD: int = 300
-
-    PLOT_MIN_WIDTH: int = 1200
-    PLOT_MIN_HEIGHT: int = 800
-
-    PLOT_MIN_WIDTH_DASHBOARD: int = 800
-    PLOT_MIN_HEIGHT_DASHBOARD: int = 600
-
-    EXPORT_PLOT_WIDTH: int = 1920
-    EXPORT_PLOT_HEIGHT: int = 1080
 
     # Configurable parameters
     config_params: ClassVar[dict[str, Any]] = {}  # Store actual config values
     config_info: ClassVar[dict[str, ConfigParam]] = {}  # Store default values and descriptions
+    config_group_order: ClassVar[list[str]] = []  # List of groups in the order they should be displayed
 
     @classmethod
     def initialize(cls) -> None:
@@ -72,14 +77,43 @@ class AppConfig:
             cls.config_params = {}  # Initialize with empty if no config file
 
     @classmethod
-    def register_param(cls, name: str, default: Any, description: str = ""):
+    def register_param(
+        cls,
+        name: str,
+        default: Any,
+        label: str = "",
+        group: str = "",
+        tooltip: str = "",
+        edit_widget: type[ParamEditWidget] | ParamEditWidget | None = None,
+        require_reload: bool = False,  # noqa: FBT001, FBT002
+    ):
         """
         Register a configuration parameter with its default value and description.
         :param name: The name of the parameter.
         :param default: The default value of the parameter.
         :param description: Description of the parameter.
         """
-        cls.config_info[name] = ConfigParam(default, description)
+        cls.config_info[name] = ConfigParam(name, default, label, group, tooltip, edit_widget, require_reload)
+
+    @classmethod
+    def set_group_order(cls, group_order: list[str]):
+        """
+        Set the order of the groups in the config file.
+        :param group_order: The order of the groups in the config file.
+        """
+        cls.config_group_order = group_order
+
+    @classmethod
+    def get_param_info(cls, name: str) -> ConfigParam:
+        """
+        Get the description of a configuration parameter.
+        :param name: The name of the parameter.
+        :return: The description of the parameter.
+        :raises: Exception if the parameter is not found or not registered.
+        """
+        if name in cls.config_info:
+            return cls.config_info[name]
+        raise KeyError(f"Parameter '{name}' is not registered")
 
     @classmethod
     def get_param(cls, name: str) -> Any:
